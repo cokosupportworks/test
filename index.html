@@ -562,7 +562,7 @@
       numbers: ['1','2','3','4','5','6','7','8','9','0']
     };
 
-    // 3. Official KanjiVG Stroke Vector Loader (Unified for Hiragana, Katakana, Kanji, and Numbers)
+    // 3. Official KanjiVG Stroke Vector Loader
     class StrokeLoader {
       constructor() {
         this.cache = new Map();
@@ -737,6 +737,7 @@
         this.isDown = false;
         this.showGrid = true;
         this.showGuide = true;
+        this.currentCategoryTab = 'hiragana';
 
         this.level = 'normal';
         this.params = {
@@ -928,15 +929,17 @@
         };
 
         const mSel = document.getElementById('modalSelect'), mSet = document.getElementById('modalSettings');
-        document.getElementById('btnOpenSelect').onclick = () => { this.populateGrid('hiragana'); mSel.classList.add('open'); };
+        document.getElementById('btnOpenSelect').onclick = () => {
+          this.selectCategoryTab(this.currentCategoryTab || 'hiragana');
+          mSel.classList.add('open');
+        };
         document.getElementById('btnCloseSelect').onclick = () => mSel.classList.remove('open');
         document.getElementById('btnSettings').onclick = () => mSet.classList.add('open');
         document.getElementById('btnCloseSettings').onclick = () => mSet.classList.remove('open');
 
         document.querySelectorAll('#tabBar .tab-btn').forEach(btn => {
           btn.onclick = () => {
-            document.querySelectorAll('#tabBar .tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active'); this.populateGrid(btn.dataset.tab);
+            this.selectCategoryTab(btn.dataset.tab);
           };
         });
 
@@ -977,6 +980,14 @@
         document.getElementById('sldFill').value = Math.round(p.maxRatio * 10);
         document.getElementById('lblFill').textContent = `${p.maxRatio}倍まで`;
         this.showToast(`判定を「${names[lvl]}」に変更`);
+      }
+
+      selectCategoryTab(tab) {
+        this.currentCategoryTab = tab || 'hiragana';
+        document.querySelectorAll('#tabBar .tab-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.tab === this.currentCategoryTab);
+        });
+        this.populateGrid(this.currentCategoryTab);
       }
 
       populateGrid(tab) {
@@ -1071,12 +1082,3 @@
   </script>
 </body>
 </html>
-"""
-
-with open('/working_dir/nazorigaki_app/index.html', 'w', encoding='utf-8') as f:
-    f.write(html_code)
-print("Updated /working_dir/nazorigaki_app/index.html successfully!")
-EOF
-python3 /working_dir/nazorigaki_app/build_fixed_hiragana.py
-}
-}
